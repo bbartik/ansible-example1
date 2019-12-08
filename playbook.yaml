@@ -1,0 +1,51 @@
+---
+- name: Simple example using net_textfsm_parse filter
+  hosts: all
+  gather_facts: no
+  connection: local
+  vars_files:
+  - auth.yaml
+  roles:
+  - ansible-network.network-engine
+
+  vars:
+    platform: cisco_ios
+    command: show ip int brief
+
+  tasks:
+  - name: CAPTURE SHOW IP INTERFACE
+    ios_command:
+      provider:
+        username: "{{ username }}"
+        password: "{{ password }}"
+        host: "{{ ansible_host }}"
+      commands:
+        - show ip interface brief
+    register: command_output
+
+  - name: PARSE OUTPUT
+    textfsm_parser:
+      file: "/home/bryan/ntc-templates/templates/cisco_ios_show_ip_interface_brief.textfsm"
+      content: "{{ command_output.stdout[0] }}"
+      name: interface_info
+
+  - name: DISPLAY OUTPUT
+    debug:
+      msg: "{{ ansible_facts.interface_info }}"
+
+  - local_action: 
+      module: copy 
+        content={{ ansible_facts.interface_info }} 
+        dest="{{ inventory_hostname }}.txt"
+      
+  - name: LAUNCH PYTHON SCRIPT TO CREATE CSV FILE
+    connection: local
+    script: conv_json_csv.py {{ inventory_hostname }}.txt
+    args:
+      executable: python3
+
+  - name: LAUNCH PYTHON SCRIPT TO CREATE WORKBOOK
+    connection: local
+    script: create_wb.py
+    args:
+      executable: python3

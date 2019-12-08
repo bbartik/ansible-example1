@@ -1,0 +1,6 @@
+.vscode
+venv
+auth.yaml
+*.csv
+*.txt
+*.xlsx
