@@ -1,6 +1,6 @@
 # ansible-example1
 
-This example demonstrates the ability of ansible to gather data from a group of nodes, parse the data and then launch pyting scripts locally to manipulate and store the date.
+This example demonstrates the ability of ansible to gather data from a group of nodes, parse the data and then launch python scripts locally to manipulate and store the date.
 
 It does the following:
 
